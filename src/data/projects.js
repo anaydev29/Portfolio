@@ -42,7 +42,7 @@ export const projects = [
       'A movie review platform: search movies and series through the OMDB API, write reviews and star ratings, keep a watchlist, and manage everything from an admin panel.',
     stack: ['Node.js', 'Express', 'MongoDB', 'JWT', 'OMDB API'],
     github: 'https://github.com/anaydev29/movie-review-system',
-    live: 'https://absolute-cinema-production.up.railway.app',
+    live: '', // the old Railway demo link expired: add a new one here when it is redeployed
   },
   {
     id: 'campus-marketplace',

@@ -39,7 +39,58 @@ const BALLS = [
   [-2.8, -0.35, -1.0, 0.3, 0xb83232, 0.18, 0.9, 2.8],
 ]
 
-export default function HeroScene({ onReady }) {
+const clamp = MathUtils.clamp
+
+// Corner roundness of the photo frame in pixels (matches the CSS)
+const PHOTO_RADIUS_PX = 64
+
+/*
+  Pushes a ball out of the photo's on-screen rounded rectangle.
+  Everything is in world units at the ball's own depth.
+  - hard rule: the ball may overlap the photo edge by at most 30% of its radius
+  - soft rule: a gentle force field around the photo nudges nearby balls away,
+    so they slide aside as the photo floats, shifts and tilts
+*/
+function pushFromPhoto(b, x, y, view) {
+  const { u, ccx, ccy, photo } = view
+  const rl = (photo.left - ccx) * u
+  const rr = (photo.right - ccx) * u
+  const rt = -(photo.top - ccy) * u
+  const rb = -(photo.bottom - ccy) * u
+  const rad = Math.min(PHOTO_RADIUS_PX * u, (rr - rl) / 2, (rt - rb) / 2)
+
+  // Closest point on the inner rectangle (the photo shrunk by its corner radius)
+  const qx = clamp(x, rl + rad, rr - rad)
+  const qy = clamp(y, rb + rad, rt - rad)
+  let dx = x - qx
+  let dy = y - qy
+  let dist = Math.hypot(dx, dy)
+  let sd // signed distance from the photo's surface (negative = inside)
+
+  if (dist < 1e-4) {
+    // Centre is inside the photo: leave through the nearest edge
+    const toL = x - rl
+    const toR = rr - x
+    const toB = y - rb
+    const toT = rt - y
+    const m = Math.min(toL, toR, toB, toT)
+    if (m === toL) [dx, dy] = [-1, 0]
+    else if (m === toR) [dx, dy] = [1, 0]
+    else if (m === toB) [dx, dy] = [0, -1]
+    else [dx, dy] = [0, 1]
+    sd = -m
+  } else {
+    dx /= dist
+    dy /= dist
+    sd = dist - rad
+  }
+
+  const minGap = b.r * 0.7
+  const push = Math.max(minGap - sd, (minGap + 0.9 - sd) * 0.45)
+  return push > 0 ? [x + dx * push, y + dy * push] : [x, y]
+}
+
+export default function HeroScene({ onReady, obstacle }) {
   const mountRef = useRef(null)
 
   useEffect(() => {
@@ -124,6 +175,7 @@ export default function HeroScene({ onReady }) {
     let raf = 0
     let visible = true
     let first = true
+    let photoEl = null
 
     const frame = (now) => {
       raf = requestAnimationFrame(frame)
@@ -133,6 +185,12 @@ export default function HeroScene({ onReady }) {
       ptr.y += ((ptr.active ? MathUtils.clamp(ty, -1.6, 1.6) : 0) - ptr.y) * 0.08
       const px = ptr.x * halfW
       const py = ptr.y * halfH
+
+      // Where the photo is on screen right now (it floats, shifts and tilts)
+      if (!photoEl && obstacle) photoEl = document.querySelector(obstacle)
+      const sceneRect = mount.getBoundingClientRect()
+      const photoRect = photoEl ? photoEl.getBoundingClientRect() : null
+      const hasPhoto = photoRect && photoRect.width > 0 && sceneRect.height > 0
 
       for (const b of balls) {
         // Gentle floating
@@ -156,6 +214,24 @@ export default function HeroScene({ onReady }) {
             y += (dy / dist) * f * 1.1
           }
         }
+
+        // The photo pushes balls aside (applied last so it always wins)
+        if (hasPhoto) {
+          const view = {
+            u: (2 * TAN * (camera.position.z - b.z)) / sceneRect.height,
+            ccx: sceneRect.left + sceneRect.width / 2,
+            ccy: sceneRect.top + sceneRect.height / 2,
+            photo: photoRect,
+          }
+          ;[x, y] = pushFromPhoto(b, x, y, view)
+        }
+
+        // Never leave the visible area, so no ball is ever cut off at the edge
+        const viewH = TAN * (camera.position.z - b.z)
+        const limitX = viewH * camera.aspect - b.r * 1.35
+        const limitY = viewH - b.r * 1.35
+        x = clamp(x, -limitX, limitX)
+        y = clamp(y, -limitY, limitY)
 
         b.cx += (x - b.cx) * 0.08
         b.cy += (y - b.cy) * 0.08

@@ -105,7 +105,7 @@ export default function Home() {
           <div className={`scene-layer ${ready ? 'ready' : ''}`} aria-hidden="true">
             {show3D && (
               <Suspense fallback={null}>
-                <HeroScene onReady={() => setReady(true)} />
+                <HeroScene onReady={() => setReady(true)} obstacle=".photo-wrap" />
               </Suspense>
             )}
           </div>
