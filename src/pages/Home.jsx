@@ -115,11 +115,6 @@ export default function Home() {
               goes here
             </span>
           </div>
-
-          <div className="chip glass">
-            <i aria-hidden="true" />
-            Open to freelance work
-          </div>
         </motion.div>
       </section>
     </PageTransition>
