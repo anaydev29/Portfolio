@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
 
-# Add your sitemap line after deploying, for example:
-# Sitemap: https://your-domain.com/sitemap.xml
+Sitemap: https://portfolio-anay-dev.vercel.app/sitemap.xml
