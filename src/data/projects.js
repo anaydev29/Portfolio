@@ -71,8 +71,7 @@ export const projects = [
     description:
       'A gamified wellness companion for students: mood tracking, journaling, habits, achievement badges, voice-guided meditation and AI support, working offline as a PWA.',
     stack: ['JavaScript', 'Node.js', 'MongoDB', 'PWA'],
-    // TODO: I could not find this repo on your GitHub: add its links here
-    github: '',
+    github: 'https://github.com/anaydev29/brightpathh',
     live: '',
   },
 ]
