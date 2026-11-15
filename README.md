@@ -18,3 +18,8 @@ Always test the production build, not the dev server (dev mode is unminified and
     npm run preview
 
 Then run Lighthouse on the preview URL (usually http://localhost:4173).
+
+## Contact form setup
+The form is wired for Formspree (free). Create a form at https://formspree.io, then put its
+endpoint in `src/data/contact.js` (or set `VITE_FORM_ENDPOINT` in a `.env` file).
+Until then, the form opens the visitor's email app with the message filled in.
