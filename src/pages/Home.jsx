@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import PageTransition from '../components/PageTransition'
+import portrait from '../assets/anay.webp'
 
 // The 3D scene is a separate chunk so the text and buttons appear instantly
 const HeroScene = lazy(() => import('../components/HeroScene'))
@@ -109,11 +110,14 @@ export default function Home() {
           </div>
 
           <div className="photo-wrap">
-            <span>
-              Your photo
-              <br />
-              goes here
-            </span>
+            <img
+              src={portrait}
+              alt="Portrait of Anay Shivhare"
+              width="640"
+              height="800"
+              fetchPriority="high"
+              decoding="async"
+            />
           </div>
         </motion.div>
       </section>
