@@ -4,17 +4,61 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#F6F4EE" />
-    <meta name="description" content="Anay Shivhare - Full Stack Developer portfolio" />
+
     <title>Anay Shivhare | Full Stack Developer</title>
+    <meta
+      name="description"
+      content="Portfolio of Anay Shivhare, a full stack MERN developer building responsive web apps, Web3 and AI-powered products. Available for freelance work."
+    />
+    <meta name="author" content="Anay Shivhare" />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Anay Shivhare" />
+    <meta property="og:title" content="Anay Shivhare | Full Stack Developer" />
+    <meta
+      property="og:description"
+      content="Full stack MERN developer building responsive web apps, Web3 and AI-powered products. Available for freelance work."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Anay Shivhare",
+        "jobTitle": "Full Stack Developer",
+        "description": "Full stack MERN developer working with React, Node.js, MongoDB, Web3 and AI-integrated applications.",
+        "knowsAbout": ["React", "Node.js", "MongoDB", "Solidity", "Three.js", "Web development"],
+        "sameAs": [
+          "https://github.com/anaydev29",
+          "https://www.linkedin.com/in/anay-shivhare-7385a8380"
+        ]
+      }
+    </script>
+
+    <!-- Fonts load without blocking the first paint -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Inter:wght@400;500;600&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=Inter:wght@400;500;600&display=swap"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>This portfolio needs JavaScript to run. Please enable it in your browser.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

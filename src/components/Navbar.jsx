@@ -40,7 +40,7 @@ export default function Navbar() {
             anay<span>.</span>
           </Link>
 
-          <ul className="nav-links">
+          <ul className="nav-links" aria-label="Main">
             {links.map(({ to, label }) => (
               <li key={to}>
                 <NavLink
@@ -85,6 +85,7 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.nav
+            aria-label="Mobile"
             className="mobile-menu"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}

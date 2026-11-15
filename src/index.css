@@ -1,14 +1,13 @@
 :root {
   /* Palette: sage + off-white + red accent */
   --bg: #f6f4ee;
-  --bg-soft: #eceee4;
   --sage: #9caf88;
   --sage-dark: #5e7552;
   --sage-light: #dfe6d3;
-  --red: #d64545;
-  --red-dark: #b83232;
+  --red: #c93c3c; /* white text on this passes WCAG AA (about 5:1) */
+  --red-dark: #a82d2d;
   --text: #222a22;
-  --text-muted: #5a645a;
+  --text-muted: #566056;
 
   --font-display: 'Fraunces', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
@@ -38,6 +37,19 @@ body {
   overflow-x: hidden;
 }
 
+/* Soft sage "aurora" behind everything, so the glass has something to blur */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(55vmax 45vmax at 88% 8%, rgba(156, 175, 136, 0.38), transparent 62%),
+    radial-gradient(40vmax 35vmax at 4% 92%, rgba(201, 60, 60, 0.09), transparent 60%),
+    radial-gradient(35vmax 30vmax at 50% 45%, rgba(223, 230, 211, 0.5), transparent 65%);
+}
+
 h1,
 h2,
 h3 {
@@ -61,7 +73,30 @@ button {
   color: #fff;
 }
 
-/* Layout helpers */
+:focus-visible {
+  outline: 3px solid var(--red);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: -64px;
+  z-index: 200;
+  background: var(--text);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* ---------- Layout helpers ---------- */
 .container {
   width: 100%;
   max-width: var(--max-w);
@@ -86,7 +121,24 @@ button {
   margin-bottom: 14px;
 }
 
-/* Buttons */
+/* ---------- Glassmorphism ---------- */
+.glass {
+  background: rgba(255, 255, 255, 0.42);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 10px 34px rgba(60, 80, 50, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgba(255, 255, 255, 0.88);
+  }
+}
+
+/* ---------- Buttons ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -132,13 +184,13 @@ button {
   z-index: 60; /* above the mobile menu (55) so the logo and close button stay visible */
   display: flex;
   align-items: center;
-  transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .nav.scrolled {
-  background: rgba(246, 244, 238, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(246, 244, 238, 0.8);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
   box-shadow: 0 1px 0 rgba(94, 117, 82, 0.15);
 }
 
@@ -153,8 +205,6 @@ button {
   font-weight: 700;
   font-size: 1.6rem;
   letter-spacing: -0.03em;
-  position: relative;
-  z-index: 60;
 }
 
 .logo span {
@@ -167,8 +217,12 @@ button {
   margin: 0;
   padding: 6px;
   gap: 4px;
-  background: var(--sage-light);
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 6px 24px rgba(60, 80, 50, 0.1);
 }
 
 .nav-link {
@@ -204,14 +258,13 @@ button {
   font-size: 0.9rem;
 }
 
-/* Hamburger */
 .burger {
-  position: relative;
-  z-index: 60;
   width: 44px;
   height: 44px;
-  border: none;
-  background: var(--sage-light);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -240,12 +293,13 @@ button {
   transform: translateY(-7px) rotate(-45deg);
 }
 
-/* Mobile menu */
 .mobile-menu {
   position: fixed;
   inset: 0;
   z-index: 55;
-  background: var(--bg);
+  background: rgba(246, 244, 238, 0.94);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -287,10 +341,10 @@ button {
   }
 }
 
-/* ---------- Home (placeholder for step 2) ---------- */
+/* ---------- Home ---------- */
 .hero {
   display: grid;
-  gap: 48px;
+  gap: 40px;
   align-items: center;
 }
 
@@ -319,11 +373,12 @@ button {
 
 .hero-stats {
   list-style: none;
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 28px;
-  margin: 40px 0 0;
-  padding: 0;
+  gap: 26px;
+  margin: 36px 0 0;
+  padding: 16px 24px;
+  border-radius: 20px;
 }
 
 .hero-stats li {
@@ -333,7 +388,7 @@ button {
 
 .hero-stats strong {
   font-family: var(--font-display);
-  font-size: 2rem;
+  font-size: 1.9rem;
   color: var(--sage-dark);
   line-height: 1;
 }
@@ -348,13 +403,32 @@ button {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 420px;
+  min-height: 400px;
 }
 
+/* 3D layer (sits behind the glass photo frame) */
 .scene-layer {
   position: absolute;
   inset: 0;
   z-index: 0;
+  pointer-events: none;
+}
+
+.scene-mount {
+  width: 100%;
+  height: 100%;
+}
+
+.scene-layer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.scene-layer.ready canvas {
+  opacity: 1;
 }
 
 @media (min-width: 820px) {
@@ -363,41 +437,125 @@ button {
   }
 }
 
-.scene-layer canvas {
-  touch-action: pan-y; /* keep vertical scrolling working on phones */
+/* Static CSS balls: first paint, reduced motion, and no-WebGL fallback */
+.orbs {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
 }
 
+.orbs.hide {
+  opacity: 0;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #f4a0a0 0%, var(--red) 42%, #8c2121 100%);
+  box-shadow: 0 14px 30px rgba(140, 33, 33, 0.25);
+  animation: orb-float 7s ease-in-out infinite;
+}
+
+.orb-1 { width: 64px; height: 64px; right: 4%; top: 8%; }
+.orb-2 { width: 36px; height: 36px; left: 2%; top: 30%; animation-delay: -2s; }
+.orb-3 { width: 84px; height: 84px; right: 0%; bottom: 12%; animation-delay: -4s; }
+.orb-4 { width: 56px; height: 56px; left: 6%; bottom: 4%; animation-delay: -1s; }
+.orb-5 { width: 28px; height: 28px; left: 40%; top: 0; animation-delay: -3s; }
+.orb-6 { width: 24px; height: 24px; right: 30%; bottom: 0; animation-delay: -5s; }
+
+@keyframes orb-float {
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb {
+    animation: none;
+  }
+}
+
+/* Glass photo frame (put your photo in as an <img> later) */
 .photo-wrap {
   position: relative;
   z-index: 1;
-  justify-self: center;
   width: min(260px, 52vw);
   aspect-ratio: 4 / 5;
   border-radius: 200px 200px var(--radius) var(--radius);
-  background: linear-gradient(160deg, var(--sage-light), var(--sage));
-  border: 3px solid var(--sage-dark);
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.6), rgba(156, 175, 136, 0.35));
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  backdrop-filter: blur(16px) saturate(160%);
+  border: 1.5px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 24px 56px rgba(60, 80, 50, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
   display: grid;
   place-items: center;
   text-align: center;
   color: var(--sage-dark);
   font-weight: 600;
-  position: relative;
 }
 
-.photo-wrap::after {
-  content: '';
+.photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Floating status chip */
+.chip {
   position: absolute;
-  right: -14px;
-  bottom: 40px;
-  width: 38px;
-  height: 38px;
-  background: var(--red);
+  z-index: 2;
+  left: 2%;
+  bottom: 14%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.chip i {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
+  background: #3f8f4f;
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(63, 143, 79, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(63, 143, 79, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip i {
+    animation: none;
+  }
 }
 
 @media (min-width: 820px) {
   .hero {
     grid-template-columns: 1.2fr 0.8fr;
+  }
+  .hero-visual {
+    min-height: 460px;
+  }
+  .photo-wrap {
+    width: min(270px, 100%);
+  }
+  .chip {
+    left: -6%;
+    bottom: 16%;
   }
 }
 
@@ -420,4 +578,106 @@ button {
   color: var(--sage-dark);
   text-align: center;
   font-weight: 500;
+}
+
+/* ---------- Custom cursor (mouse devices only) ---------- */
+.has-cursor,
+.has-cursor a,
+.has-cursor button,
+.has-cursor [data-cursor] {
+  cursor: none;
+}
+
+.has-cursor input,
+.has-cursor textarea,
+.has-cursor select {
+  cursor: text;
+}
+
+.cursor-dot,
+.cursor-ring,
+.cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+
+.cursor-dot.is-visible,
+.cursor-ring.is-visible,
+.cursor-glow.is-visible {
+  opacity: 1;
+}
+
+.cursor-dot {
+  z-index: 9999;
+}
+
+.cursor-dot i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  border-radius: 50%;
+  background: var(--red);
+  transition: transform 0.25s ease;
+}
+
+.cursor-dot.is-link i {
+  transform: scale(0);
+}
+
+.cursor-ring {
+  z-index: 9998;
+}
+
+.cursor-ring i {
+  display: block;
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  border-radius: 50%;
+  border: 1.5px solid var(--sage-dark);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.cursor-ring.is-link i {
+  transform: scale(1.7);
+  background: rgba(201, 60, 60, 0.14);
+  border-color: var(--red);
+}
+
+.cursor-ring.is-down i {
+  transform: scale(0.75);
+}
+
+.cursor-ring.is-link.is-down i {
+  transform: scale(1.35);
+}
+
+/* Soft glow that follows the cursor, behind the page content */
+.cursor-glow {
+  z-index: -1;
+}
+
+.cursor-glow::before {
+  content: '';
+  display: block;
+  width: 520px;
+  height: 520px;
+  margin: -260px 0 0 -260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(156, 175, 136, 0.34), transparent 65%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

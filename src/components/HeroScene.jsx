@@ -1,75 +1,206 @@
-import { useRef } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { Float, MeshDistortMaterial } from '@react-three/drei'
-import * as THREE from 'three'
+import { useEffect, useRef } from 'react'
+import {
+  WebGLRenderer,
+  Scene,
+  PerspectiveCamera,
+  SphereGeometry,
+  MeshPhysicalMaterial,
+  Mesh,
+  HemisphereLight,
+  DirectionalLight,
+  PointLight,
+  MathUtils,
+} from 'three'
 
-const SAGE = '#9caf88'
-const RED = '#d64545'
+/*
+  Glossy red balls that float, shift with the cursor (parallax) and
+  get pushed away when the cursor comes close.
 
-// Pull the camera back on narrow (portrait) containers so nothing gets cropped
-function ResponsiveCamera() {
-  const { camera, size } = useThree()
-  const aspect = size.width / size.height
-  camera.position.z = aspect < 1.2 ? 5.6 + (1.2 - aspect) * 2.2 : 5.6
-  camera.updateProjectionMatrix()
-  return null
-}
+  Written with plain three.js (no React Three Fiber / drei) to keep the
+  JavaScript small. Only the pieces we use are imported, so the bundler
+  can drop the rest of three.
+*/
 
-function Blob() {
-  const group = useRef()
+const FOV = 45
+const TAN = Math.tan(MathUtils.degToRad(FOV / 2))
+// The area that should always stay visible, whatever the screen shape
+const HALF_W = 3.7
+const HALF_H = 3.1
 
-  // Tilt the whole group toward the pointer (mouse on desktop, touch on mobile)
-  useFrame((state) => {
-    const { x, y } = state.pointer
-    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, x * 0.6, 0.06)
-    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -y * 0.4, 0.06)
-  })
+// x, y, z, radius, colour, float amount, float speed, phase
+const BALLS = [
+  [1.95, 1.35, 0.6, 0.52, 0xc93c3c, 0.18, 0.9, 0.0],
+  [-2.25, 0.85, 0.2, 0.34, 0xd9534f, 0.22, 1.1, 1.3],
+  [2.3, -1.2, 0.9, 0.68, 0xb83232, 0.15, 0.7, 2.1],
+  [-1.75, -1.65, 0.7, 0.5, 0xc93c3c, 0.2, 0.8, 3.4],
+  [0.35, 2.25, -0.4, 0.28, 0xe06060, 0.25, 1.2, 4.2],
+  [-0.3, -2.35, 1.1, 0.22, 0xd9534f, 0.2, 1.0, 5.0],
+  [2.85, 0.15, -0.8, 0.24, 0xa82d2d, 0.2, 1.3, 0.7],
+  [-2.8, -0.35, -1.0, 0.3, 0xb83232, 0.18, 0.9, 2.8],
+]
 
-  return (
-    <group ref={group}>
-      <Float speed={1.6} rotationIntensity={0.4} floatIntensity={1.1}>
-        {/* Main sage blob */}
-        <mesh scale={1.55}>
-          <icosahedronGeometry args={[1, 24]} />
-          <MeshDistortMaterial
-            color={SAGE}
-            distort={0.42}
-            speed={1.8}
-            roughness={0.25}
-            metalness={0.05}
-          />
-        </mesh>
+export default function HeroScene({ onReady }) {
+  const mountRef = useRef(null)
 
-        {/* Red ring orbiting the blob */}
-        <mesh rotation={[Math.PI / 2.4, 0.3, 0]} scale={2.15}>
-          <torusGeometry args={[1, 0.018, 16, 120]} />
-          <meshStandardMaterial color={RED} roughness={0.4} />
-        </mesh>
-      </Float>
+  useEffect(() => {
+    const mount = mountRef.current
 
-      {/* Small red satellite */}
-      <Float speed={2.4} floatIntensity={2}>
-        <mesh position={[1.9, 1.3, 0.4]}>
-          <sphereGeometry args={[0.16, 32, 32]} />
-          <meshStandardMaterial color={RED} roughness={0.3} />
-        </mesh>
-      </Float>
-    </group>
-  )
-}
+    let renderer
+    try {
+      renderer = new WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
+    } catch {
+      return // No WebGL: the CSS orbs stay in place instead
+    }
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
+    mount.appendChild(renderer.domElement)
 
-export default function HeroScene() {
-  return (
-    <Canvas
-      camera={{ position: [0, 0, 5.6], fov: 45 }}
-      dpr={[1, 1.75]}
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-    >
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[3, 4, 5]} intensity={1.6} />
-      <directionalLight position={[-4, -2, 2]} intensity={0.5} color="#fff3e6" />
-      <ResponsiveCamera />
-      <Blob />
-    </Canvas>
-  )
+    const scene = new Scene()
+    const camera = new PerspectiveCamera(FOV, 1, 0.1, 50)
+
+    // Sage-tinted ambient light keeps the reds feeling part of the palette
+    scene.add(new HemisphereLight(0xffffff, 0x9caf88, 1.4))
+    const key = new DirectionalLight(0xffffff, 2.6)
+    key.position.set(3, 4, 5)
+    scene.add(key)
+    const rim = new PointLight(0xffd0c0, 30, 0, 2)
+    rim.position.set(-4, 2, 3)
+    scene.add(rim)
+
+    const geometry = new SphereGeometry(1, 48, 32)
+    const materials = new Map()
+    const balls = BALLS.map(([x, y, z, r, color, amp, speed, phase]) => {
+      if (!materials.has(color)) {
+        materials.set(
+          color,
+          new MeshPhysicalMaterial({
+            color,
+            roughness: 0.22,
+            metalness: 0,
+            clearcoat: 1,
+            clearcoatRoughness: 0.12,
+          }),
+        )
+      }
+      const mesh = new Mesh(geometry, materials.get(color))
+      mesh.scale.setScalar(r)
+      mesh.position.set(x, y, z)
+      scene.add(mesh)
+      return { mesh, r, x, y, z, amp, speed, phase, cx: x, cy: y }
+    })
+
+    // Fit the scene to the container (portrait phones and wide desktops)
+    let halfW = HALF_W
+    let halfH = HALF_H
+    const resize = () => {
+      const w = mount.clientWidth || 1
+      const h = mount.clientHeight || 1
+      renderer.setSize(w, h, false)
+      camera.aspect = w / h
+      camera.position.z = Math.max(HALF_H / TAN, HALF_W / (TAN * camera.aspect))
+      camera.updateProjectionMatrix()
+      halfH = TAN * camera.position.z
+      halfW = halfH * camera.aspect
+    }
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(mount)
+
+    // Pointer position relative to the scene (-1..1), smoothed every frame
+    const ptr = { x: 0, y: 0, active: false }
+    let tx = 0
+    let ty = 0
+    const onMove = (e) => {
+      const rect = mount.getBoundingClientRect()
+      tx = ((e.clientX - rect.left) / rect.width) * 2 - 1
+      ty = -(((e.clientY - rect.top) / rect.height) * 2 - 1)
+      ptr.active = true
+    }
+    const onLeave = () => {
+      ptr.active = false
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    document.documentElement.addEventListener('pointerleave', onLeave)
+
+    let raf = 0
+    let visible = true
+    let first = true
+
+    const frame = (now) => {
+      raf = requestAnimationFrame(frame)
+      const t = now / 1000
+
+      ptr.x += ((ptr.active ? MathUtils.clamp(tx, -1.6, 1.6) : 0) - ptr.x) * 0.08
+      ptr.y += ((ptr.active ? MathUtils.clamp(ty, -1.6, 1.6) : 0) - ptr.y) * 0.08
+      const px = ptr.x * halfW
+      const py = ptr.y * halfH
+
+      for (const b of balls) {
+        // Gentle floating
+        let x = b.x + Math.cos(t * b.speed + b.phase) * b.amp * 0.6
+        let y = b.y + Math.sin(t * b.speed * 1.1 + b.phase) * b.amp
+
+        // Parallax: balls closer to the camera move more
+        const depth = 0.5 + b.z * 0.4
+        x += ptr.x * 0.28 * depth
+        y += ptr.y * 0.28 * depth
+
+        // Push away from the cursor
+        if (ptr.active) {
+          const dx = x - px
+          const dy = y - py
+          const dist = Math.hypot(dx, dy) || 0.001
+          const reach = 1.5 + b.r
+          if (dist < reach) {
+            const f = 1 - dist / reach
+            x += (dx / dist) * f * 1.1
+            y += (dy / dist) * f * 1.1
+          }
+        }
+
+        b.cx += (x - b.cx) * 0.08
+        b.cy += (y - b.cy) * 0.08
+        b.mesh.position.set(b.cx, b.cy, b.z)
+      }
+
+      renderer.render(scene, camera)
+      if (first) {
+        first = false
+        onReady?.()
+      }
+    }
+
+    // Only animate while the scene is on screen and the tab is visible
+    const start = () => {
+      if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame)
+    }
+    const stop = () => {
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
+    const io = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting
+      visible ? start() : stop()
+    })
+    io.observe(mount)
+    const onVisibility = () => (document.hidden ? stop() : start())
+    document.addEventListener('visibilitychange', onVisibility)
+    start()
+
+    return () => {
+      stop()
+      io.disconnect()
+      ro.disconnect()
+      window.removeEventListener('pointermove', onMove)
+      document.documentElement.removeEventListener('pointerleave', onLeave)
+      document.removeEventListener('visibilitychange', onVisibility)
+      geometry.dispose()
+      materials.forEach((m) => m.dispose())
+      renderer.dispose()
+      renderer.forceContextLoss()
+      renderer.domElement.remove()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return <div ref={mountRef} className="scene-mount" />
 }
