@@ -479,10 +479,36 @@ button {
 }
 
 /* Glass photo frame (put your photo in as an <img> later) */
-.photo-wrap {
+/* Outer wrapper: sizes the photo, floats gently and shifts with the pointer */
+.photo-float {
   position: relative;
   z-index: 1;
   width: min(260px, 52vw);
+  animation: photo-float 7s ease-in-out infinite;
+  will-change: transform, translate;
+  transition: translate 0.15s linear;
+}
+
+@keyframes photo-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(0.6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-float {
+    animation: none;
+  }
+}
+
+.photo-wrap {
+  position: relative;
+  width: 100%;
+  will-change: transform;
   aspect-ratio: 4 / 5;
   /* Photo shape: big soft corners with one sharp corner at the bottom left.
      Try a circle with 50% instead (and change aspect-ratio to 1 / 1). */
@@ -503,6 +529,14 @@ button {
   font-weight: 600;
 }
 
+/* Soft light that slides across the photo as it tilts */
+.photo-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(340px circle at var(--gx, 50%) var(--gy, 30%), rgba(255, 255, 255, 0.32), transparent 60%);
+}
+
 .photo-wrap img {
   display: block;
   width: 100%;
@@ -518,7 +552,7 @@ button {
   .hero-visual {
     min-height: 460px;
   }
-  .photo-wrap {
+  .photo-float {
     width: min(270px, 100%);
   }
 }
