@@ -3,6 +3,8 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import Navbar from './components/Navbar'
 import Cursor from './components/Cursor'
+import Magnetic from './components/Magnetic'
+import PageWipe from './components/PageWipe'
 import Home from './pages/Home'
 import Projects from './pages/Projects'
 import Skills from './pages/Skills'
@@ -44,6 +46,8 @@ export default function App() {
         Skip to content
       </a>
       <Cursor />
+      <Magnetic />
+      <PageWipe />
       <Navbar />
       <AnimatePresence mode="wait" initial={false}>
         <Routes location={location} key={location.pathname}>

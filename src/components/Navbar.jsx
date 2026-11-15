@@ -65,7 +65,7 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <Link to="/contact" className="btn btn-primary nav-cta">
+          <Link to="/contact" className="btn btn-primary nav-cta" data-magnetic>
             Hire me
           </Link>
 

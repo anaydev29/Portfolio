@@ -223,7 +223,7 @@ export default function Contact() {
                 <input id="_gotcha" name="_gotcha" type="text" tabIndex={-1} autoComplete="off" />
               </div>
 
-              <button type="submit" className="btn btn-primary form-submit" disabled={status === 'sending'}>
+              <button type="submit" className="btn btn-primary form-submit" data-magnetic disabled={status === 'sending'}>
                 {status === 'sending' ? 'Sending…' : 'Send message'}
               </button>
 

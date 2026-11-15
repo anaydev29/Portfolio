@@ -1052,3 +1052,34 @@ button {
     scroll-behavior: auto;
   }
 }
+
+/* ---------- Polish: magnetic buttons and page wipe ---------- */
+[data-magnetic] {
+  transition:
+    translate 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.page-wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  will-change: transform;
+  background: var(--sage-dark);
+  border-radius: 50% 50% 0 0 / 14% 14% 0 0;
+}
+
+.page-wipe::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: var(--red);
+}

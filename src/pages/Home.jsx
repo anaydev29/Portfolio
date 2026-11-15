@@ -66,10 +66,10 @@ export default function Home() {
           </p>
 
           <motion.div className="hero-actions" {...fadeUp(0.1)}>
-            <Link to="/projects" className="btn btn-primary">
+            <Link to="/projects" className="btn btn-primary" data-magnetic>
               View projects
             </Link>
-            <Link to="/contact" className="btn btn-ghost">
+            <Link to="/contact" className="btn btn-ghost" data-magnetic>
               Get in touch
             </Link>
           </motion.div>
