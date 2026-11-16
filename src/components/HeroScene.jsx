@@ -47,7 +47,7 @@ const PHOTO_RADIUS_PX = 64
 /*
   Pushes a ball out of the photo's on-screen rounded rectangle.
   Everything is in world units at the ball's own depth.
-  - hard rule: the ball may overlap the photo edge by at most 30% of its radius
+  - hard rule: the ball always keeps a small gap from the photo edge
   - soft rule: a gentle force field around the photo nudges nearby balls away,
     so they slide aside as the photo floats, shifts and tilts
 */
@@ -85,8 +85,8 @@ function pushFromPhoto(b, x, y, view) {
     sd = dist - rad
   }
 
-  const minGap = b.r * 0.7
-  const push = Math.max(minGap - sd, (minGap + 0.9 - sd) * 0.45)
+  const minGap = b.r * 1.15
+  const push = Math.max(minGap - sd, (minGap + 1.0 - sd) * 0.5)
   return push > 0 ? [x + dx * push, y + dy * push] : [x, y]
 }
 

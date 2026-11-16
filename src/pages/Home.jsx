@@ -58,7 +58,7 @@ export default function Home() {
           <span className="eyebrow">Hello, I'm Anay</span>
           {/* Heading and intro are not animated so they paint immediately */}
           <h1>
-            I build <em>Python-powered</em> full stack apps.
+            I build <em>full stack</em> apps.
           </h1>
           <p>
             B.Tech Computer Science &amp; Design student building full stack apps with Python,
