@@ -14,7 +14,7 @@ import Contact from './pages/Contact'
 const META = {
   '/': [
     'Anay Shivhare | Full Stack Developer',
-    'Portfolio of Anay Shivhare, a full stack MERN developer building responsive web apps, Web3 and AI-powered products. Available for freelance work.',
+    'Portfolio of Anay Shivhare, a full stack developer building apps with Python, FastAPI, PostgreSQL and React, also comfortable with the MERN stack. Web3 and AI-powered products. Available for freelance work.',
   ],
   '/projects': [
     'Projects | Anay Shivhare',

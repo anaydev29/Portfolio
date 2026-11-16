@@ -10,7 +10,7 @@ export const skillGroups = [
   {
     id: 'backend',
     title: 'Backend',
-    items: ['Node.js', 'Express.js', 'MongoDB', 'PostgreSQL', 'REST APIs'],
+    items: ['Python', 'FastAPI', 'PostgreSQL', 'Node.js', 'Express.js', 'MongoDB', 'REST APIs'],
   },
   {
     id: 'web3',
@@ -20,12 +20,12 @@ export const skillGroups = [
   {
     id: 'ai-tools',
     title: 'AI & Tools',
-    items: ['Google Gemini API', 'Python', 'Git & GitHub', 'PWA', 'SVG Animations'],
+    items: ['Google Gemini API', 'Git & GitHub', 'PWA', 'SVG Animations'],
   },
   {
     id: 'languages',
     title: 'Languages',
-    items: ['JavaScript', 'TypeScript', 'Python', 'C++', 'Java (DSA)'],
+    items: ['Python', 'JavaScript', 'TypeScript', 'C++', 'Java (DSA)'],
   },
   {
     id: 'mobile',

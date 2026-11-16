@@ -350,7 +350,7 @@ button {
 }
 
 .hero h1 {
-  font-size: clamp(2.8rem, 9vw, 5.2rem);
+  font-size: clamp(2.1rem, 9.4vw, 5.2rem);
   margin-bottom: 18px;
 }
 
@@ -1120,3 +1120,6 @@ button {
   border-radius: 50%;
   background: var(--red);
 }
+
+/* keep "Python-powered" on one line */
+.hero h1 em { white-space: nowrap; }

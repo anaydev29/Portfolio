@@ -58,12 +58,12 @@ export default function Home() {
           <span className="eyebrow">Hello, I'm Anay</span>
           {/* Heading and intro are not animated so they paint immediately */}
           <h1>
-            I build <em>full stack</em> web experiences.
+            I build <em>Python-powered</em> full stack apps.
           </h1>
           <p>
-            B.Tech Computer Science &amp; Design student and MERN developer, with a growing
-            focus on Web3 and AI-integrated apps. Open to freelance work and remote
-            opportunities.
+            B.Tech Computer Science &amp; Design student building full stack apps with Python,
+            FastAPI, PostgreSQL and React, and comfortable with the MERN stack too. Interested
+            in data-driven products, Web3 and AI. Open to freelance work and remote opportunities.
           </p>
 
           <motion.div className="hero-actions" {...fadeUp(0.1)}>
